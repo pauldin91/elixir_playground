@@ -20,6 +20,8 @@ defmodule Identicon.MixProject do
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
-    []
+    [
+      {:mogrify, "~> 0.9.1"}
+    ]
   end
 end

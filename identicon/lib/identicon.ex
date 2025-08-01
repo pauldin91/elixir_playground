@@ -1,4 +1,6 @@
 defmodule Identicon do
+  import Mogrify
+
   def main(input) do
     input
     |> hash_input
@@ -9,11 +11,34 @@ defmodule Identicon do
   end
 
   def save_image(image, input) do
-    File.write("#{input}.png", image)
+    folder = "generated"
+    File.mkdir_p(folder)
+    File.write!("#{folder}/#{input}.png", image)
   end
 
-  def draw_image(%Identicon.Image{color: color, grid: [h | t]}) do
-    [fill_rectangle(h, color) | draw_image(%Identicon.Image{color: color, grid: t})]
+  def draw_image(%Identicon.Image{color: {r, g, b}, grid: grid}) do
+    path = "temporary.png"
+    size = "250x250"
+    color = "rgb(#{r},#{g},#{b})"
+
+    %Mogrify.Image{}
+    |> custom("size", size)
+    |> canvas("white")
+    |> create(path: path)
+    |> save()
+
+    image =
+      Mogrify.open(path)
+      |> custom("fill", color)
+      |> custom("stroke", "none")
+
+    Enum.each(grid, fn {{x1, y1}, {x2, y2}} ->
+      image
+      |> custom("draw", "rectangle #{x1},#{y1} #{x2},#{y2}")
+      |> save(in_place: true)
+    end)
+
+    File.read!(path)
   end
 
   def fill_rectangle({{sh, sv}, {th, tv}}, {r, g, b}) do
@@ -28,9 +53,9 @@ defmodule Identicon do
           |> Enum.chunk_every(size)
           |> Enum.take_while(fn list -> length(list) == size end)
           |> Enum.map(fn list -> list ++ tl(Enum.reverse(list)) end)
-          |> Enum.map(fn list -> Enum.filter(list, fn num -> rem(num, 2) == 0 end) end)
           |> List.flatten()
           |> Enum.with_index()
+          |> Enum.filter(fn {num, _} -> rem(num, 2) == 0 end)
           |> Enum.map(fn {_, index} ->
             h = rem(index, 5) * 50
             v = div(index, 5) * 50
