@@ -1,7 +1,7 @@
 defmodule BotiqueSuggestionsTest do
   use ExUnit.Case
 
-  describe "putting all together" do
+  test "putting all together" do
     top1 = %{item_name: "Long Sleeve T-shirt", price: 19.95, color: "Deep Red", base_color: "red"}
 
     top2 = %{
@@ -50,8 +50,6 @@ defmodule BotiqueSuggestionsTest do
       {top3, bottom1}
     ]
 
-    actual = BoutiqueSuggestions.get_combinations(tops, bottoms)
-    IO.puts(Enum.count(actual))
-    assert actual == expected
+    assert BoutiqueSuggestions.get_combinations(tops, bottoms) == expected
   end
 end
