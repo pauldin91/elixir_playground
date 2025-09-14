@@ -9,7 +9,7 @@ defmodule Spiral do
   def matrix(dimension) do
     for i <- 0..(dimension - 1), j <- 0..(dimension - 1) do
       cond do
-        i == 0 ->
+        i < j ->
           dimension * i + j + 1
 
         j == dimension - 1 ->
@@ -19,7 +19,7 @@ defmodule Spiral do
           i * dimension - j - 1
 
         true ->
-          i + j * dimension + 1
+          dimension - i + j * dimension + 1
       end
     end
     |> Enum.chunk_every(dimension)
