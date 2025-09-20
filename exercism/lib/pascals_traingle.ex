@@ -21,14 +21,13 @@ defmodule PascalsTriangle do
             do: Enum.at(h, i - 1) + Enum.at(h, i)
           )
       ]
-      |> Enum.reverse()
 
     append =
       cond do
         rem(num, 2) == 1 -> Enum.reverse(res)
-        true -> tl(res) |> Enum.reverse()
+        true -> Enum.reverse(res) |> tl()
       end
 
-    do_rows([append ++ res | l], num + 1, to)
+    do_rows([res ++ append | l], num + 1, to)
   end
 end
