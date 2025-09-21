@@ -8,7 +8,7 @@ defmodule ListOps do
   @spec count(list) :: non_neg_integer
   def count([]), do: 0
 
-  def count([h | t]) do
+  def count([_ | t]) do
     1 + count(t)
   end
 
@@ -39,14 +39,14 @@ defmodule ListOps do
 
   @type acc :: any
   @spec foldl(list, acc, (any, acc -> acc)) :: acc
-  def foldl([], acc, f), do: acc
+  def foldl([], acc, _), do: acc
 
   def foldl([h | t], acc, f) do
     foldl(t, f.(h, acc), f)
   end
 
   @spec foldr(list, acc, (any, acc -> acc)) :: acc
-  def foldr([], acc, f), do: acc
+  def foldr([], acc, _), do: acc
 
   def foldr(list, acc, f) do
     foldl(reverse(list), acc, f)
@@ -54,13 +54,13 @@ defmodule ListOps do
 
   @spec append(list, list) :: list
   def do_append([], [], list), do: list
-  def do_append([], [hb | tb] = b, list), do: do_append([], tb, [hb | list])
-  def do_append([ha | ta] = a, [], list), do: do_append(ta, [], [ha | list])
+  def do_append([], [hb | tb], list), do: do_append([], tb, [hb | list])
+  def do_append([ha | ta], [], list), do: do_append(ta, [], [ha | list])
 
   def do_append([ha | ta] = a, [hb | tb] = b, list) do
     cond do
-      a != [] -> do_append(ta, b, [ha | list])
-      b != [] -> do_append([], tb, [hb | list])
+      Enum.count(a) != 0 -> do_append(ta, b, [ha | list])
+      Enum.count(b) != 0 -> do_append([], tb, [hb | list])
       true -> list
     end
   end

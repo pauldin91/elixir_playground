@@ -11,7 +11,7 @@ defmodule TopSecret do
   end
 
   def decode_secret_message_part(
-        {d, _, [{:when, _, [{name, _, args}, {cons, _, conditions}]}, _]} = ast,
+        {d, _, [{:when, _, [{name, _, args}, {_, _, _}]}, _]} = ast,
         acc
       )
       when is_atom(name) and (d == :def or d == :defp) do

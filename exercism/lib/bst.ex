@@ -15,7 +15,7 @@ defmodule BinarySearchTree do
   @spec insert(bst_node, any) :: bst_node
   def insert(nil, data), do: new(data)
 
-  def insert(%{data: node_data, left: left, right: right} = tree, data) do
+  def insert(%{data: node_data, left: left, right: right}, data) do
     cond do
       node_data >= data -> %{data: node_data, left: insert(left, data), right: right}
       true -> %{data: node_data, left: left, right: insert(right, data)}
@@ -27,9 +27,9 @@ defmodule BinarySearchTree do
   """
   @spec in_order(bst_node) :: [any]
   def in_order(nil), do: []
-  def in_order(%{data: node_data, left: nil, right: nil} = tree), do: [node_data]
+  def in_order(%{data: node_data, left: nil, right: nil}), do: [node_data]
 
-  def in_order(%{data: node_data, left: left, right: right} = tree) do
+  def in_order(%{data: node_data, left: left, right: right}) do
     in_order(left) ++ [node_data] ++ in_order(right)
   end
 end

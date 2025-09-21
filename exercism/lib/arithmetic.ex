@@ -16,10 +16,6 @@ defmodule RationalNumbers do
     end
   end
 
-  def gcd(a, b) do
-    gcd(b, rem(a, b))
-  end
-
   @doc """
   Add two rational numbers
   """
@@ -100,13 +96,6 @@ defmodule RationalNumbers do
 
   def inv(a) do
     {elem(a, 1), elem(a, 0)}
-  end
-
-  @doc """
-  Exponentiation of a real number by a rational number
-  """
-  @spec pow_real(x :: integer, n :: rational) :: float
-  def pow_real(x, n) do
   end
 
   @doc """

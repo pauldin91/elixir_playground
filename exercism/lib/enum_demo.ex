@@ -9,7 +9,7 @@ defmodule BoutiqueInventory do
     Enum.filter(inventory, fn s -> s.price == nil end)
   end
 
-  def update_names([], old_word, new_word), do: []
+  def update_names([], _old_word, _new_word), do: []
 
   def update_names(inventory, old_word, new_word) do
     Enum.map(inventory, fn s ->
@@ -27,7 +27,7 @@ defmodule BoutiqueInventory do
     end)
   end
 
-  def increase_quantity(nil, count), do: nil
+  def increase_quantity(nil, _count), do: nil
 
   def increase_quantity(item, count) do
     cond do
