@@ -9,18 +9,7 @@ defmodule Clock do
   """
   @spec new(integer, integer) :: Clock
   def new(hour, minute) do
-    {m, hours} = do_minutes(hour, minute)
-
-    h =
-      cond do
-        hours >= 0 ->
-          rem(hours, 24)
-
-        true ->
-          rem(24 - rem(-hours, 24), 24)
-      end
-
-    %Clock{hour: h, minute: m}
+    do_minutes(hour, minute)
   end
 
   @doc """
@@ -31,33 +20,38 @@ defmodule Clock do
   """
   @spec add(Clock, integer) :: Clock
   def add(%Clock{hour: hour, minute: minute}, add_minute) do
-    total_minute = minute + add_minute
-
-    {m, hours} = do_minutes(hour, total_minute)
-
-    h =
-      cond do
-        hours >= 0 ->
-          rem(hours, 24)
-
-        true ->
-          rem(24 - rem(-hours, 24), 24)
-      end
-
-    %Clock{hour: h, minute: m}
+    do_minutes(hour, minute + add_minute)
   end
 
   defp do_minutes(hour, minute) do
-    cond do
-      minute >= 0 ->
-        {rem(minute, 60), div(minute, 60) + hour}
+    min = rem(minute, 60)
+    hr = hour + div(minute, 60)
 
-      rem(minute, 60) == 0 ->
-        {rem(60 - rem(-minute, 60), 60), hour + div(minute, 60)}
+    r =
+      cond do
+        rem(minute, 60) != 0 -> 1
+        true -> 0
+      end
 
-      true ->
-        {rem(60 - rem(-minute, 60), 60), hour + div(minute, 60) - 1}
-    end
+    {minutes, h} =
+      cond do
+        minute >= 0 ->
+          {min, hr}
+
+        true ->
+          {rem(60 + min, 60), hr - r}
+      end
+
+    hours =
+      cond do
+        h >= 0 ->
+          rem(h, 24)
+
+        true ->
+          rem(24 - rem(-h, 24), 24)
+      end
+
+    %Clock{hour: hours, minute: minutes}
   end
 end
 
