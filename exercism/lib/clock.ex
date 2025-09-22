@@ -24,34 +24,8 @@ defmodule Clock do
   end
 
   defp do_minutes(hour, minute) do
-    min = rem(minute, 60)
-    hr = hour + div(minute, 60)
-
-    r =
-      cond do
-        rem(minute, 60) != 0 -> 1
-        true -> 0
-      end
-
-    {minutes, h} =
-      cond do
-        minute >= 0 ->
-          {min, hr}
-
-        true ->
-          {rem(60 + min, 60), hr - r}
-      end
-
-    hours =
-      cond do
-        h >= 0 ->
-          rem(h, 24)
-
-        true ->
-          rem(24 - rem(-h, 24), 24)
-      end
-
-    %Clock{hour: hours, minute: minutes}
+    minutes = hour * 60 + minute
+    %Clock{hour: Integer.mod(floor(minutes / 60), 24), minute: Integer.mod(minutes, 60)}
   end
 end
 
