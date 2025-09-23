@@ -10,12 +10,40 @@ defmodule RunLengthEncoder do
   def encode(""), do: ""
 
   def encode(string) do
+    do_encode(String.graphemes(string), 0, "", []) |> Enum.join()
+  end
+
+  def do_encode([], times, char, result), do: flush_letter(result, times, char)
+
+  def do_encode([h | t], times, char, result) do
+    cond do
+      Regex.match?(~r/\s*[^a-zA-Z\s]{1}\s*/, h) ->
+        do_encode(t, 0, "", flush_letter(result, times, char) ++ [h])
+
+      h != char ->
+        do_encode(t, 1, h, flush_letter(result, times, char))
+
+      true ->
+        do_encode(t, times + 1, char, result)
+    end
+  end
+
+  def flush_letter(string, times, char) do
+    cond do
+      times == 1 -> string ++ [char]
+      times > 1 -> string ++ [Integer.to_string(times) <> char]
+      true -> string
+    end
   end
 
   @spec decode(String.t()) :: String.t()
   def decode(string) do
     do_decode(
-      Regex.scan(~r/\s*[0-9]{0,2}[a-zA-Z]{1}\s*/, string) |> Enum.map(fn c -> hd(c) end),
+      Regex.scan(
+        ~r/\.*[0-9]{0,2}[a-zA-Z\s]{1}\.*/,
+        string
+      )
+      |> Enum.map(fn c -> hd(c) end),
       []
     )
     |> Enum.join()
@@ -26,7 +54,7 @@ defmodule RunLengthEncoder do
   def do_decode([h | t], res) do
     s =
       Regex.named_captures(
-        ~r/(?<space_before>\s*)(?<times>[0-9]{0,2})(?<letter>[a-zA-Z]{1})(?<space_after>\s*)/,
+        ~r/(?<space_before>\s*)(?<times>[0-9]{0,2})(?<letter>[a-zA-Z\s]{1})(?<space_after>\s*)/,
         h
       )
 
@@ -45,7 +73,8 @@ defmodule RunLengthEncoder do
           res ++
             [
               space_before <>
-                String.duplicate(letter, String.to_integer(String.trim(times))) <> space_after
+                String.duplicate(letter, String.to_integer(String.trim(times))) <>
+                space_after
             ]
         )
     end
