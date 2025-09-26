@@ -37,6 +37,7 @@ defmodule GrepTest do
       """)
 
       on_exit(fn ->
+        nil
         File.rm!("iliad.txt")
 
         File.rm!("midsummer-night.txt")
