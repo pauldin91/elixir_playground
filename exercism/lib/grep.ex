@@ -1,25 +1,14 @@
 defmodule Grep do
   @spec grep(String.t(), [String.t()], [String.t()]) :: String.t()
   def grep(pattern, flags, files) do
-    lines = get_lines(files)
-
-    Enum.filter(lines, fn s ->
-      comparison(
-        flags,
-        String.split(s, ":") |> Enum.reverse() |> hd |> String.trim_trailing("\n"),
-        pattern
-      )
-    end)
+    get_lines(flags, pattern, files)
     |> Enum.map(fn s -> numbers(flags, s) end)
-    |> Enum.map(fn s ->
-      file_output(flags, s, files)
-    end)
+    |> Enum.map(fn s -> file_output(flags, s, files) end)
     |> Enum.uniq()
     |> Enum.join()
-    |> String.replace("\n\n", "\n")
   end
 
-  def get_lines(files) do
+  def get_lines(flags, pattern, files) do
     Enum.map(files, fn f ->
       {:ok, content} = File.read(f)
       {f, content}
@@ -27,18 +16,15 @@ defmodule Grep do
     |> Enum.map(fn {n, s} ->
       {n, s |> String.split("\n") |> Enum.with_index()}
     end)
-    |> Enum.reduce([], fn x, acc ->
-      acc ++
-        for(
-          n <- elem(x, 1),
-          do:
-            cond do
-              elem(n, 0) != "" -> elem(x, 0) <> ":" <> "#{elem(n, 1) + 1}:" <> elem(n, 0) <> "\n"
-              true -> ""
-            end
-        )
+    |> Enum.map(fn {filename, lines_with_index} ->
+      Enum.filter(lines_with_index, fn {line, _} ->
+        line != "" && comparison(flags, line, pattern)
+      end)
+      |> Enum.map(fn {line, index} -> filename <> ":" <> "#{index + 1}:" <> line <> "\n" end)
     end)
-    |> Enum.filter(fn r -> !String.ends_with?(r, ":") or String.trim(r) != "" end)
+    |> Enum.reduce([], fn x, acc ->
+      acc ++ x
+    end)
   end
 
   def file_output(flags, s, files) do
@@ -50,19 +36,16 @@ defmodule Grep do
   end
 
   def comparison(flags, s1, s2) do
+    {t1, t2} =
+      cond do
+        Enum.member?(flags, "-i") -> {String.downcase(s1), String.downcase(s2)}
+        true -> {s1, s2}
+      end
+
     res =
       cond do
-        Enum.member?(flags, "-x") && Enum.member?(flags, "-i") ->
-          String.downcase(s1) == String.downcase(s2)
-
-        Enum.member?(flags, "-x") ->
-          s1 == s2
-
-        Enum.member?(flags, "-i") ->
-          String.contains?(String.downcase(s1), String.downcase(s2))
-
-        true ->
-          String.contains?(s1, s2)
+        Enum.member?(flags, "-x") -> t1 == t2
+        true -> String.contains?(t1, t2)
       end
 
     cond do
