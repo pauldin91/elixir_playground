@@ -11,15 +11,19 @@ defmodule Tournament do
   listing the teams in alphabetical order.
   """
   @spec tally(input :: list(String.t())) :: String.t()
-  @points %{"W" => 3, "L" => 0, "D" => 1}
+  @points %{"win" => 3, "loss" => 0, "draw" => 1}
+  @rev_outcome %{"win" => "loss", "draw" => "draw", "loss" => "win"}
   def tally(input) do
     headers =
       """
       Team                           | MP |  W |  D |  L |  P
       """
 
-    result = do_tally(input, %{}) |> Map.to_list()
-    do_format(result, headers) |> String.trim("\n")
+    do_tally(input, %{})
+    |> Map.to_list()
+    |> Enum.sort_by(fn {_, score} -> Map.get(score, "P") end, :desc)
+    |> do_format(headers)
+    |> String.trim("\n")
   end
 
   def do_format([], headers), do: headers
@@ -28,9 +32,16 @@ defmodule Tournament do
     do_format(
       t,
       headers <>
-        name <>
-        String.duplicate(" ", 31 - String.length(name)) <>
-        "|  #{Map.get(score, "MP", 0)} |  #{Map.get(score, "W", 0)} |  #{Map.get(score, "D", 0)} |  #{Map.get(score, "L", 0)} |  #{Map.get(score, "P", 0)}\n"
+        String.pad_trailing(name, 31) <>
+        "|" <>
+        String.pad_leading("#{Map.get(score, "MP", 0)} ", 4) <>
+        "|" <>
+        String.pad_leading("#{Map.get(score, "win", 0)} ", 4) <>
+        "|" <>
+        String.pad_leading("#{Map.get(score, "draw", 0)} ", 4) <>
+        "|" <>
+        String.pad_leading("#{Map.get(score, "loss", 0)} ", 4) <>
+        "|" <> String.pad_leading("#{Map.get(score, "P", 0)}\n", 4)
     )
   end
 
@@ -40,48 +51,35 @@ defmodule Tournament do
     outcome = String.split(h, ";")
 
     cond do
-      Enum.at(outcome, 2) == "win" ->
-        result = update_values(outcome, 0, result)
+      Enum.count(outcome) != 3 ->
         do_tally(t, result)
 
-      Enum.at(outcome, 2) == "draw" ->
-        result = update_values(outcome, -1, result)
-        do_tally(t, result)
+      Map.get(@points, Enum.at(outcome, 2)) != nil ->
+        do_tally(t, update_values(outcome, result))
 
       true ->
-        result = update_values(outcome, 1, result)
         do_tally(t, result)
     end
   end
 
-  def update_values(outcome, win_team, result) do
-    cond do
-      win_team == -1 ->
-        {_, result} =
-          Map.get_and_update(result, Enum.at(outcome, 0), fn score ->
-            update_score(score, "D")
-          end)
+  def update_values(input, result) do
+    winner =
+      cond do
+        Enum.at(input, 2) == "win" -> {0, Enum.at(input, 2)}
+        true -> {1, Map.get(@rev_outcome, Enum.at(input, 2))}
+      end
 
-        {_, result} =
-          Map.get_and_update(result, Enum.at(outcome, 1), fn score ->
-            update_score(score, "D")
-          end)
+    {_, result} =
+      Map.get_and_update(result, Enum.at(input, elem(winner, 0)), fn score ->
+        update_score(score, elem(winner, 1))
+      end)
 
-        result
+    {_, result} =
+      Map.get_and_update(result, Enum.at(input, Integer.mod(elem(winner, 0) + 1, 2)), fn score ->
+        update_score(score, Map.get(@rev_outcome, elem(winner, 1)))
+      end)
 
-      true ->
-        {_, result} =
-          Map.get_and_update(result, Enum.at(outcome, win_team), fn score ->
-            update_score(score, "W")
-          end)
-
-        {_, result} =
-          Map.get_and_update(result, Enum.at(outcome, rem(win_team + 1, 2)), fn score ->
-            update_score(score, "L")
-          end)
-
-        result
-    end
+    result
   end
 
   defp update_score(score, key) do
@@ -106,27 +104,14 @@ defmodule Tournament do
 
     {_, scr} =
       Map.get_and_update(scr, "P", fn _ ->
-        update_points(scr, key)
+        update_outcome(scr, "P", fn c -> c + Map.get(@points, key) end)
       end)
 
     {:score, scr}
   end
 
-  defp update_outcome(score, key) do
-    outcome = Map.get(score, key, nil)
-
-    cond do
-      outcome == nil -> {key, 1}
-      true -> {key, outcome + 1}
-    end
-  end
-
-  defp update_points(score, outcome) do
-    points = Map.get(score, "P", nil)
-
-    cond do
-      points == nil -> {"P", 1}
-      true -> {"P", points + Map.get(@points, outcome) + 1}
-    end
+  defp update_outcome(score, key, inc \\ fn c -> c + 1 end) do
+    points = Map.get(score, key, 0)
+    {key, inc.(points)}
   end
 end
