@@ -46,7 +46,7 @@ defmodule AffineCipher do
          |> to_charlist
          |> Enum.map(fn x ->
            cond do
-             x >= 97 && x <= 122 -> 97 + Integer.mod(Integer.pow(a, 11) * x - b, 26)
+             x >= 97 && x <= 122 -> 97 + Integer.mod(Integer.pow(a, 11) * (x - 97 - b), 26)
              true -> x
            end
          end)
