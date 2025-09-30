@@ -8,6 +8,9 @@ defmodule PalindromeProducts do
 
   def generate(max_factor, min_factor \\ 1) when max_factor >= min_factor do
     cond do
+      max_factor < min_factor ->
+        raise ArgumentError
+
       max_factor < 10 ->
         %{1 => [[1, 1]], 9 => [[1, 9], [3, 3]]}
 
@@ -17,8 +20,6 @@ defmodule PalindromeProducts do
 
         maximum =
           do_find_max(max_factor * max_factor, min_factor, max_factor)
-
-        # %{min: minimum, max: maximum}
 
         cond do
           minimum != nil and maximum != nil ->
@@ -50,34 +51,6 @@ defmodule PalindromeProducts do
       true -> do_find_max(f - 1, min_factor, max_factor)
     end
   end
-
-  def generate(max_factor, min_factor) when max_factor < min_factor, do: raise(ArgumentError)
-
-  def naive_generate(max_factor, min_factor \\ 1) when max_factor >= min_factor do
-    all =
-      for n <- min_factor..max_factor,
-          k <- n..max_factor,
-          palindrome?(n * k) do
-        n * k
-      end
-
-    # cond do
-    #   Enum.count(all) == 0 ->
-    #     %{}
-
-    #   true ->
-    #     minimum = Enum.min(all)
-    #     maximum = Enum.max(all)
-
-    #     %{
-    #       minimum => factors(minimum, min_factor,max_factor),
-    #       maximum => factors(maximum, min_factor,max_factor)
-    #     }
-    # end
-  end
-
-  def naive_generate(max_factor, min_factor) when max_factor < min_factor,
-    do: raise(ArgumentError)
 
   def factors(num, min_factor, max_factor) do
     1..floor(:math.sqrt(num))
