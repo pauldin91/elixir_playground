@@ -11,9 +11,6 @@ defmodule PalindromeProducts do
       max_factor < min_factor ->
         raise ArgumentError
 
-      max_factor < 10 ->
-        %{1 => [[1, 1]], 9 => [[1, 9], [3, 3]]}
-
       true ->
         minimum =
           do_find_min(min_factor * min_factor, min_factor, max_factor)
