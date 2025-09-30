@@ -22,7 +22,6 @@ defmodule PalindromeProductsTest do
   end
 
   @tag :pending
-
   test "smallest palindrome from double digit factors" do
     palindromes = PalindromeProducts.generate(99, 10)
 
@@ -36,9 +35,8 @@ defmodule PalindromeProductsTest do
   test "largest palindrome from double digit factors" do
     palindromes = PalindromeProducts.generate(99, 10)
 
-    assert palindromes |> Map.keys() |> Enum.sort() |> List.last() == 9009
-
     assert palindromes[9009] == [[91, 99]]
+    assert palindromes |> Map.keys() |> Enum.sort() |> List.last() == 9009
   end
 
   @tag :pending
@@ -56,9 +54,8 @@ defmodule PalindromeProductsTest do
   test "largest palindrome from triple digit factors" do
     palindromes = PalindromeProducts.generate(999, 100)
 
-    assert palindromes |> Map.keys() |> Enum.sort() |> List.last() == 906_609
-
     assert palindromes[906_609] == [[913, 993]]
+    assert palindromes |> Map.keys() |> Enum.sort() |> List.last() == 906_609
   end
 
   @tag :pending
@@ -80,9 +77,8 @@ defmodule PalindromeProductsTest do
   test "largest palindrome from four digit factors" do
     palindromes = PalindromeProducts.generate(9999, 1000)
 
-    assert palindromes |> Map.keys() |> Enum.sort() |> List.last() == 99_000_099
-
     assert palindromes[99_000_099] == [[9901, 9999]]
+    assert palindromes |> Map.keys() |> Enum.sort() |> List.last() == 99_000_099
   end
 
   @tag :pending
