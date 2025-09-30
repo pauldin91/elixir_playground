@@ -54,13 +54,13 @@ defmodule PalindromeProducts do
 
   def factors(num, min_factor, max_factor) do
     1..floor(:math.sqrt(num))
-    |> Enum.filter(fn s -> rem(num, s) == 0 end)
-    |> Enum.flat_map(fn s -> [[s, div(num, s)]] end)
-    |> Enum.map(&Enum.sort/1)
-    |> Enum.uniq()
-    |> Enum.filter(fn [a, b] ->
-      a <= max_factor and b <= max_factor and a >= min_factor and b >= min_factor
+    |> Enum.filter(fn s ->
+      r = rem(num, s)
+      d = div(num, s)
+      r == 0 and s <= max_factor and d <= max_factor and s >= min_factor and d >= min_factor
     end)
+    |> Enum.flat_map(fn s -> [[s, div(num, s)]] end)
+    |> Enum.uniq()
   end
 
   def palindrome?(s) do
