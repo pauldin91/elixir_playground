@@ -43,8 +43,17 @@ defmodule SaddlePoints do
       |> MapSet.new()
 
     MapSet.union(row_max, col_max)
-    |> Enum.group_by(fn {s, _i} -> s end, fn {_r, i} -> i end)
-    |> Enum.filter(fn {_s, v} -> Enum.count(v) > 1 end)
-    |> Enum.map(fn s -> elem(s, 1) end)
+    |> Enum.group_by(fn {s, _i} -> s end, fn {_n, r} ->
+      r
+    end)
+    |> Enum.reduce([], fn v, acc ->
+      cond do
+        Enum.count(elem(v, 1)) > 1 ->
+          (acc ++ elem(v, 1)) |> Enum.reverse() |> Enum.map(fn t -> t + 1 end)
+
+        true ->
+          acc
+      end
+    end)
   end
 end
