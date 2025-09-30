@@ -6,7 +6,7 @@ defmodule PalindromeProducts do
   @prev %{10 => 1, 100 => 10, 1000 => 100, 99 => 9, 999 => 99, 9999 => 999}
   @spec generate(non_neg_integer, non_neg_integer) :: map
 
-  def generate(max_factor, min_factor \\ 1) when max_factor >= min_factor do
+  def generate(max_factor, min_factor \\ 1) do
     cond do
       max_factor < min_factor ->
         raise ArgumentError
