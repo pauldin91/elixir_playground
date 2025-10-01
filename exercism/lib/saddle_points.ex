@@ -8,8 +8,7 @@ defmodule SaddlePoints do
 
   def rows(str) do
     String.split(str, "\n")
-    |> Enum.map(fn s -> String.split(s) end)
-    |> Enum.map(fn s -> Enum.map(s, fn c -> String.to_integer(c) end) end)
+    |> Enum.map(fn s -> String.split(s) |> Enum.map(fn c -> String.to_integer(c) end) end)
   end
 
   @doc """
@@ -19,9 +18,8 @@ defmodule SaddlePoints do
   @spec columns(String.t()) :: [[integer]]
   def columns(str) do
     String.split(str, "\n")
-    |> Enum.map(fn s -> String.split(s) end)
     |> Enum.flat_map(fn s ->
-      Enum.map(s, fn c -> String.to_integer(c) end) |> Enum.with_index()
+      String.split(s) |> Enum.map(fn c -> String.to_integer(c) end) |> Enum.with_index()
     end)
     |> Enum.group_by(fn {_, i} -> i end, fn {i, _} -> i end)
     |> Enum.reduce([], fn el, acc -> acc ++ [elem(el, 1)] end)
@@ -35,25 +33,22 @@ defmodule SaddlePoints do
   def saddle_points(""), do: []
 
   def saddle_points(str) do
-    row_max = rows(str) |> Enum.map(fn s -> Enum.with_index(s) |> Enum.max() end) |> MapSet.new()
+    row_max =
+      rows(str)
+      |> Enum.map(fn s -> s end)
+      |> Enum.with_index()
+      |> Enum.map(fn {v, x} -> {Enum.max(v), x + 1} end)
 
     col_max =
       columns(str)
-      |> Enum.map(fn s -> Enum.with_index(s) |> Enum.min() end)
-      |> MapSet.new()
+      |> Enum.map(fn s -> s end)
+      |> Enum.with_index()
+      |> Enum.map(fn {v, x} -> {Enum.min(v), x + 1} end)
 
-    MapSet.union(row_max, col_max)
-    |> Enum.group_by(fn {s, _i} -> s end, fn {_n, r} ->
-      r
+    Enum.flat_map(col_max, fn {val, index} ->
+      Enum.filter(row_max, fn {v1, _i} -> val == v1 end)
+      |> Enum.map(fn {_v, i} -> {i, index} end)
     end)
-    |> Enum.reduce([], fn v, acc ->
-      cond do
-        Enum.count(elem(v, 1)) > 1 ->
-          (acc ++ elem(v, 1)) |> Enum.reverse() |> Enum.map(fn t -> t + 1 end)
-
-        true ->
-          acc
-      end
-    end)
+    |> Enum.sort_by(fn {f, s} -> {f, s} end)
   end
 end

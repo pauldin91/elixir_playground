@@ -3,7 +3,7 @@ defmodule Multi.MixProject do
 
   def project do
     [
-      app: :superpowers,
+      app: :async_threading,
       version: "0.1.0",
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
