@@ -73,7 +73,9 @@ defmodule TransposeTest do
   @tag :pending
 
   test "second line longer than first line" do
-    input = "The first line.\n" <> "The second line."
+    input =
+      "The first line.\n" <>
+        "The second line."
 
     expected =
       "TT\n" <>
