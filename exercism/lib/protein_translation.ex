@@ -10,9 +10,7 @@ defmodule ProteinTranslation do
     result =
       String.graphemes(rna)
       |> Enum.chunk_every(3)
-      |> Enum.map(fn chunk -> Enum.join(chunk) end)
-      |> Enum.map(fn chunk -> of_codon(chunk) end)
-      |> Enum.map(fn {_, codon} -> codon end)
+      |> Enum.map(fn chunk -> Enum.join(chunk) |> of_codon |> elem(1) end)
       |> Enum.take_while(fn c -> c != "STOP" end)
 
     cond do

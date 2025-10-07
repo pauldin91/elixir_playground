@@ -12,40 +12,27 @@ defmodule RailFenceCipher do
         str
 
       true ->
-        String.graphemes(str)
-        |> Enum.with_index()
-        |> Enum.map(fn {s, i} ->
-          camels(s, i, rails)
+        0..(String.length(str) - 1)
+        |> Enum.map(fn i ->
+          camels(i, rails)
         end)
+        |> Enum.zip(String.graphemes(str))
         |> Enum.group_by(fn {i, _} -> i end, fn {_, v} -> v end)
         |> Enum.map(fn {_, v} -> v |> Enum.join() end)
         |> Enum.join()
     end
   end
 
-  def camels(s, i, rails) do
+  def camels(i, rails) do
     r = rails - 1
     d = div(i, r)
 
     cond do
       rem(d, 2) == 0 ->
-        {rem(i, r), s}
+        rem(i, r)
 
       true ->
-        {r - rem(i, r), s}
-    end
-  end
-
-  def rev_camels(s, i, rails) do
-    r = rails - 1
-    d = div(i, r)
-
-    cond do
-      rem(d, 2) == 0 ->
-        {rem(i, r), s}
-
-      true ->
-        {r - rem(i, r), s}
+        r - rem(i, r)
     end
   end
 
@@ -53,23 +40,18 @@ defmodule RailFenceCipher do
   Decode a given rail fence ciphertext to the corresponding plaintext
   """
   @spec decode(String.t(), pos_integer) :: String.t()
-  def decode(str, 1), do: str
+  def decode(str, rails) when rails > bit_size(str) / 8 or rails == 1, do: str
 
   def decode(str, rails) do
-    cond do
-      String.graphemes(str) |> MapSet.new() |> Enum.count() < rails ->
-        str
-
-      true ->
-        String.graphemes(str)
-        |> Enum.with_index()
-        |> Enum.map(fn {s, i} ->
-          camels(s, i, rails)
-        end)
-        |> Enum.group_by(fn {s, i} -> s end, fn {_s, i} -> i end)
-
-        # |> Enum.map(fn {_, v} -> v |> Enum.join() end)
-        # |> Enum.join()
-    end
+    0..(String.length(str) - 1)
+    |> Enum.with_index()
+    |> Enum.map(fn {_, i} ->
+      {camels(i, rails), i}
+    end)
+    |> Enum.sort_by(&elem(&1, 0))
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.zip(str |> String.graphemes())
+    |> Enum.sort_by(&elem(&1, 0))
+    |> Enum.map_join(&elem(&1, 1))
   end
 end

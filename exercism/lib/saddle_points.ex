@@ -35,13 +35,11 @@ defmodule SaddlePoints do
   def saddle_points(str) do
     row_max =
       rows(str)
-      |> Enum.map(fn s -> s end)
       |> Enum.with_index()
       |> Enum.map(fn {v, x} -> {Enum.max(v), x + 1} end)
 
     col_max =
       columns(str)
-      |> Enum.map(fn s -> s end)
       |> Enum.with_index()
       |> Enum.map(fn {v, x} -> {Enum.min(v), x + 1} end)
 
