@@ -1,8 +1,4 @@
 defmodule SplitSecondStopwatch do
-  @doc """
-  A stopwatch that can be used to track lap times.
-  """
-
   @type state :: :ready | :running | :stopped
 
   defmodule Stopwatch do
@@ -28,7 +24,9 @@ defmodule SplitSecondStopwatch do
   end
 
   ## API
-
+  @doc """
+  A stopwatch that can be used to track lap times.
+  """
   @spec new() :: Stopwatch.t()
   def new() do
     %Stopwatch{state: :ready, current: zero(), laps: []}

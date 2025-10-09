@@ -8,20 +8,6 @@ defmodule Garden do
     that information in a map.
   """
   @plants %{"C" => :clover, "G" => :grass, "R" => :radishes, "V" => :violets}
-  @student_ids %{
-    0 => :alice,
-    1 => :bob,
-    2 => :charlie,
-    3 => :david,
-    4 => :eve,
-    5 => :fred,
-    6 => :ginny,
-    7 => :harriet,
-    8 => :ileana,
-    9 => :joseph,
-    10 => :kincaid,
-    11 => :larry
-  }
   @students [
     :alice,
     :bob,
