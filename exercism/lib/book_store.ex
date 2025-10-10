@@ -7,8 +7,8 @@ defmodule BookStore do
   """
   @spec total(basket :: [book]) :: integer
   def total(basket) do
-    f = split_sets(basket, [])
-    reduce_freqs(f, 0)
+    f = split_sets(basket |> Enum.frequencies() |> Map.to_list(), [])
+    Enum.map(f, &reduce_freqs(&1, 0)) |> Enum.sum()
   end
 
   def reduce_freqs(prev, acc) do
@@ -50,29 +50,43 @@ defmodule BookStore do
     end
   end
 
-  def possible_sets([], right, acc), do: [right | acc]
-
-  def possible_sets([h | t], remaining, acc) do
-    right = [h | remaining]
-
-    l =
-      possible_sets(
-        t,
-        right,
-        [t, right | acc]
-      )
-
-    possible_sets(t, remaining |> Enum.reverse(), l)
-    |> Enum.map(&Enum.sort(&1))
-    |> Enum.uniq()
-  end
-
   def split_sets([], acc), do: acc |> Enum.filter(&(&1 != []))
 
   def split_sets(input, acc) do
     valid = Enum.filter(input, fn {_, f} -> f > 0 end)
     left = Enum.map(valid, fn {k, _} -> {k, 1} end)
-    right = Enum.map(valid, fn {k, f} -> {k, f - 1} end)
-    split_sets(right, [left | acc])
+    right = Enum.map(valid, fn {k, f} -> {k, f - 1} end) |> Enum.filter(fn {_, f} -> f > 0 end)
+
+    cond do
+      abs(Enum.count(left) - Enum.count(right)) >= 2 ->
+        {l, r} = do_split(left, right)
+        split_sets(r, [l | acc])
+
+      true ->
+        split_sets(right, [left | acc])
+    end
+  end
+
+  def do_split(left, right) do
+    s1 = left |> MapSet.new()
+    s2 = right |> MapSet.new()
+    diff = MapSet.symmetric_difference(s1, s2) |> MapSet.to_list()
+    intersection = MapSet.intersection(s1, s2)
+
+    cond do
+      Enum.count(diff) <= 1 ->
+        {left, right}
+
+      true ->
+        middle = div(Enum.count(diff), 2)
+
+        {MapSet.new(MapSet.union(intersection, diff |> Enum.take(middle) |> MapSet.new())),
+         MapSet.new(
+           MapSet.union(
+             intersection,
+             diff |> Enum.reverse() |> Enum.take(middle + 1) |> MapSet.new()
+           )
+         )}
+    end
   end
 end
