@@ -57,14 +57,7 @@ defmodule BookStore do
     left = Enum.map(valid, fn {k, _} -> {k, 1} end)
     right = Enum.map(valid, fn {k, f} -> {k, f - 1} end) |> Enum.filter(fn {_, f} -> f > 0 end)
 
-    cond do
-      abs(Enum.count(left) - Enum.count(right)) >= 2 ->
-        {l, r} = do_split(left, right)
-        split_sets(r, [l | acc])
-
-      true ->
-        split_sets(right, [left | acc])
-    end
+    split_sets(right, [left | acc])
   end
 
   def do_split(left, right) do
