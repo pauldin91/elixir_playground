@@ -73,20 +73,6 @@ defmodule BookStore do
     diff = MapSet.symmetric_difference(s1, s2) |> MapSet.to_list()
     intersection = MapSet.intersection(s1, s2)
 
-    cond do
-      Enum.count(diff) <= 1 ->
-        {left, right}
-
-      true ->
-        middle = div(Enum.count(diff), 2)
-
-        {MapSet.new(MapSet.union(intersection, diff |> Enum.take(middle) |> MapSet.new())),
-         MapSet.new(
-           MapSet.union(
-             intersection,
-             diff |> Enum.reverse() |> Enum.take(middle + 1) |> MapSet.new()
-           )
-         )}
-    end
+    {left, right}
   end
 end
