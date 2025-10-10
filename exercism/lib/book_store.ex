@@ -7,7 +7,7 @@ defmodule BookStore do
   """
   @spec total(basket :: [book]) :: integer
   def total(basket) do
-    f = split_sets(basket)
+    f = split_sets(basket, [])
     reduce_freqs(f, 0)
   end
 
@@ -67,30 +67,12 @@ defmodule BookStore do
     |> Enum.uniq()
   end
 
-  def split_sets(l) do
-    freqs = Enum.frequencies(l)
-    left = freqs |> Enum.filter(fn {_, f} -> f == 1 end)
-    right = freqs |> Enum.filter(fn {_, f} -> f > 1 end)
+  def split_sets([], acc), do: acc |> Enum.filter(&(&1 != []))
 
-    cond do
-      Enum.count(left) == 1 -> [l]
-      true -> do_split(left, right, []) |> Enum.filter(&(&1 != []))
-    end
-  end
-
-  def do_split([], right, acc) do
-    cond do
-      Enum.all?(right, fn {_, o} -> o > 0 end) -> [right | acc]
-      true -> acc
-    end
-  end
-
-  def do_split([h | t], right, acc) do
-    valid = Enum.filter(right, fn {_, f} -> f > 0 end)
-
-    new_left = [h | Enum.map(valid, fn {k, _} -> {k, 1} end)]
-    new_right = Enum.map(valid, fn {k, f} -> {k, f - 1} end)
-
-    do_split(t, new_right, [new_left | acc])
+  def split_sets(input, acc) do
+    valid = Enum.filter(input, fn {_, f} -> f > 0 end)
+    left = Enum.map(valid, fn {k, _} -> {k, 1} end)
+    right = Enum.map(valid, fn {k, f} -> {k, f - 1} end)
+    split_sets(right, [left | acc])
   end
 end
