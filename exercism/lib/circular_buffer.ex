@@ -76,8 +76,11 @@ defmodule CircularBuffer do
         [h | t] = buffer.buffer
 
         cond do
-          t == [] -> {:reply, {:ok, h}, %CircularBuffer{buffer: [], capacity: buffer.capacity}}
-          true -> {:reply, {:ok, h}, %CircularBuffer{buffer | starting_at: hd(t), buffer: t}}
+          t == [] ->
+            {:reply, {:ok, h}, %CircularBuffer{buffer: [], capacity: buffer.capacity}}
+
+          true ->
+            {:reply, {:ok, h}, %CircularBuffer{buffer | starting_at: hd(t), buffer: t}}
         end
     end
   end
@@ -87,7 +90,7 @@ defmodule CircularBuffer do
   end
 
   def handle_call(:clear, _from, buffer) do
-    {:reply, :ok, %CircularBuffer{buffer | buffer: []}}
+    {:reply, :ok, %CircularBuffer{buffer | starting_at: nil, buffer: []}}
   end
 
   @impl true
@@ -102,16 +105,20 @@ defmodule CircularBuffer do
   end
 
   def handle_cast({:overwrite, item}, buffer) do
-    {left, right} = Enum.split(buffer.buffer, buffer.starting_at)
+    {left, right} = Enum.split_with(buffer.buffer, fn s -> s == buffer.starting_at end)
 
-    IO.puts(inspect(left))
-    IO.puts(inspect(right))
+    oldest =
+      cond do
+        right != [] -> hd(right)
+        left != [] -> hd(left)
+        true -> item
+      end
 
     {:noreply,
      %CircularBuffer{
        buffer
-       | starting_at: hd(right),
-         buffer: ([item | left |> Enum.reverse() |> tl] |> Enum.reverse()) ++ right
+       | starting_at: oldest,
+         buffer: (left -- [buffer.starting_at]) ++ right ++ [item]
      }}
   end
 end
