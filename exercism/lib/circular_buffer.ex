@@ -7,7 +7,7 @@ defmodule CircularBuffer do
   Create a new buffer of a given capacity
   """
 
-  defstruct [:buffer, :capacity, :starting_at]
+  defstruct [:buffer, :capacity, :oldest]
   @spec new(capacity :: integer) :: {:ok, pid}
   def new(capacity) do
     GenServer.start_link(__MODULE__, capacity)
@@ -69,19 +69,21 @@ defmodule CircularBuffer do
   @impl true
   def handle_call(:read, _from, buffer) do
     cond do
-      buffer.starting_at == nil or buffer.buffer == [] ->
+      buffer.buffer == [] ->
         {:reply, {:error, :empty}, []}
 
       true ->
         [h | t] = buffer.buffer
 
-        cond do
-          t == [] ->
-            {:reply, {:ok, h}, %CircularBuffer{buffer: [], capacity: buffer.capacity}}
+        oldest =
+          cond do
+            t == [] -> nil
+            true -> hd(t)
+          end
 
-          true ->
-            {:reply, {:ok, h}, %CircularBuffer{buffer | starting_at: hd(t), buffer: t}}
-        end
+        IO.puts(oldest)
+
+        {:reply, {:ok, h}, %CircularBuffer{buffer | oldest: oldest, buffer: t}}
     end
   end
 
@@ -90,22 +92,22 @@ defmodule CircularBuffer do
   end
 
   def handle_call(:clear, _from, buffer) do
-    {:reply, :ok, %CircularBuffer{buffer | starting_at: nil, buffer: []}}
+    {:reply, :ok, %CircularBuffer{buffer | oldest: nil, buffer: []}}
   end
 
   @impl true
   def handle_cast({:write, item}, buffer) do
-    cond do
-      buffer.starting_at == nil or buffer.buffer == [] ->
-        {:noreply, %CircularBuffer{buffer: [item], starting_at: item, capacity: buffer.capacity}}
+    oldest =
+      cond do
+        buffer.buffer == [] -> item
+        true -> buffer.oldest
+      end
 
-      true ->
-        {:noreply, %CircularBuffer{buffer | buffer: buffer.buffer ++ [item]}}
-    end
+    {:noreply, %CircularBuffer{buffer | buffer: buffer.buffer ++ [item], oldest: oldest}}
   end
 
   def handle_cast({:overwrite, item}, buffer) do
-    {left, right} = Enum.split_with(buffer.buffer, fn s -> s == buffer.starting_at end)
+    {left, right} = Enum.split_with(buffer.buffer, fn s -> s == buffer.oldest end)
 
     oldest =
       cond do
@@ -117,8 +119,8 @@ defmodule CircularBuffer do
     {:noreply,
      %CircularBuffer{
        buffer
-       | starting_at: oldest,
-         buffer: (left -- [buffer.starting_at]) ++ right ++ [item]
+       | oldest: oldest,
+         buffer: (left -- [buffer.oldest]) ++ right ++ [item]
      }}
   end
 end
