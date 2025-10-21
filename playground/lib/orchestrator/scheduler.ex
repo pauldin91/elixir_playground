@@ -1,2 +1,0 @@
-defmodule Scheduler do
-end
