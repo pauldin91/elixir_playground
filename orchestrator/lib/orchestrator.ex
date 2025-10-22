@@ -5,7 +5,8 @@ defmodule Orchestrator do
   def start(_type, _args) do
     children = [
       {Registry, name: Orchestrator.Registry, keys: :unique},
-      {DynamicSupervisor, name: Orchestrator.DispatcherSupervisor, strategy: :one_for_one}
+      {DynamicSupervisor, name: Orchestrator.DispatcherSupervisor, strategy: :one_for_one},
+      {Orchestrator.WorkerSupervisor, []}
     ]
 
     Supervisor.start_link(children,

@@ -11,4 +11,10 @@ defmodule OrchestratorTest do
 
     assert Orchestrator.create_queue(name) == {:error, {:already_started, bucket}}
   end
+
+  test "enqueue dispatcher" do
+    name = :hakuna_mattata
+
+    assert {:ok, bucket} = Orchestrator.Dispatcher.start_link(name: name)
+  end
 end
