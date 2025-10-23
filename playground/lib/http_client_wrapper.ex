@@ -1,4 +1,4 @@
-defmodule ConnectionProcess do
+defmodule HttpClientWrapper do
   use GenServer
 
   require Logger

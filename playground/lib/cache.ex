@@ -1,25 +1,23 @@
 defmodule Cache do
-  defmodule TaskCache do
-    def init() do
-      Task.start_link(fn -> add(%{}) end)
-    end
+  def init() do
+    Task.start_link(fn -> loop(%{}) end)
+  end
 
-    def add(map) do
-      receive do
-        {:get, key, caller} ->
-          send(caller, Map.get(map, key, nil))
-          add(map)
+  def loop(map) do
+    receive do
+      {:get, key, caller} ->
+        send(caller, Map.get(map, key, nil))
+        loop(map)
 
-        {:put, key, value} ->
-          add(Map.put(map, key, value))
+      {:put, key, value} ->
+        loop(Map.put(map, key, value))
 
-        {:del, key} ->
-          add(Map.delete(map, key))
+      {:del, key} ->
+        loop(Map.delete(map, key))
 
-        {:retrieve, caller} ->
-          send(caller, {:ok, map})
-          add(map)
-      end
+      {:retrieve, caller} ->
+        send(caller, {:ok, map})
+        loop(map)
     end
   end
 end
