@@ -4,15 +4,12 @@ defmodule Orchestrator do
   @impl true
   def start(_type, _args) do
     children = [
-      {Registry, name: Orchestrator.Registry, keys: :unique},
-      {DynamicSupervisor, name: Orchestrator.DispatcherSupervisor, strategy: :one_for_one},
-      {Orchestrator.WorkerSupervisor, []}
+      {Registry, keys: :unique, name: Orchestrator.Registry},
+      {DynamicSupervisor, strategy: :one_for_one, name: Orchestrator.WorkerSupervisor},
+      {DynamicSupervisor, strategy: :one_for_one, name: Orchestrator.DispatcherSupervisor}
     ]
 
-    Supervisor.start_link(children,
-      strategy: :one_for_one,
-      name: Orchestrator.Supervisor
-    )
+    Supervisor.start_link(children, strategy: :one_for_one, name: Orchestrator.Supervisor)
   end
 
   def create_queue(name) do

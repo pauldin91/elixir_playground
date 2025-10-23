@@ -6,11 +6,16 @@ defmodule Orchestrator.Worker do
 
   @impl true
   def init({fun, args}) do
-    spawn(fn ->
+    Task.start(fn ->
       apply(fun, args)
-      GenServer.stop(self(), :normal)
+      GenServer.cast(self(), :done)
     end)
 
     {:ok, %{fun: fun, args: args}}
+  end
+
+  @impl true
+  def handle_cast(:done, state) do
+    {:stop, :normal, state}
   end
 end

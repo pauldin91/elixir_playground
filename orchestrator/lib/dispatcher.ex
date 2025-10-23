@@ -2,8 +2,6 @@ defmodule Orchestrator.Dispatcher do
   use GenServer
   alias Orchestrator.WorkerSupervisor
 
-  ## --- Public API ---
-
   def start_link(opts) do
     name = Keyword.fetch!(opts, :name)
     GenServer.start_link(__MODULE__, [], name: name)
@@ -13,8 +11,6 @@ defmodule Orchestrator.Dispatcher do
     GenServer.cast(via(queue_name), {:enq, {fun, args}})
   end
 
-  ## --- GenServer callbacks ---
-
   @impl true
   def init(_), do: {:ok, []}
 
@@ -23,8 +19,6 @@ defmodule Orchestrator.Dispatcher do
     WorkerSupervisor.start_worker(fun, args)
     {:noreply, state}
   end
-
-  ## --- Helpers ---
 
   defp via(name), do: {:via, Registry, {Orchestrator.Registry, name}}
 end
