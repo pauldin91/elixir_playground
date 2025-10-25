@@ -1,12 +1,12 @@
-defmodule WebApi.Models do
+defmodule WebApi.Ledger do
   @moduledoc """
-  The Models context.
+  The Ledger context.
   """
 
   import Ecto.Query, warn: false
   alias WebApi.Repo
 
-  alias WebApi.Models.Transaction
+  alias WebApi.Ledger.Transaction
 
   @doc """
   Returns the list of transactions.

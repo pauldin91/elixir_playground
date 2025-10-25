@@ -1,23 +1,21 @@
 defmodule WebApiWeb.TransactionControllerTest do
   use WebApiWeb.ConnCase
 
-  import WebApi.AccountsFixtures
+  import WebApi.LedgerFixtures
 
-  alias WebApi.Accounts.Transaction
+  alias WebApi.Ledger.Transaction
 
   @create_attrs %{
-    comment: "some comment",
     receiver: "some receiver",
-    sender: "some sender",
-    amount: 120.5
+    amount: 120.5,
+    sender: "some sender"
   }
   @update_attrs %{
-    comment: "some updated comment",
     receiver: "some updated receiver",
-    sender: "some updated sender",
-    amount: 456.7
+    amount: 456.7,
+    sender: "some updated sender"
   }
-  @invalid_attrs %{comment: nil, receiver: nil, sender: nil, amount: nil}
+  @invalid_attrs %{receiver: nil, amount: nil, sender: nil}
 
   setup %{conn: conn} do
     {:ok, conn: put_req_header(conn, "accept", "application/json")}
@@ -40,7 +38,6 @@ defmodule WebApiWeb.TransactionControllerTest do
       assert %{
                "id" => ^id,
                "amount" => 120.5,
-               "comment" => "some comment",
                "receiver" => "some receiver",
                "sender" => "some sender"
              } = json_response(conn, 200)["data"]
@@ -64,7 +61,6 @@ defmodule WebApiWeb.TransactionControllerTest do
       assert %{
                "id" => ^id,
                "amount" => 456.7,
-               "comment" => "some updated comment",
                "receiver" => "some updated receiver",
                "sender" => "some updated sender"
              } = json_response(conn, 200)["data"]

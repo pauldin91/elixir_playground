@@ -1,5 +1,5 @@
 defmodule WebApiWeb.TransactionJSON do
-  alias WebApi.Models.Transaction
+  alias WebApi.Ledger.Transaction
 
   @doc """
   Renders a list of transactions.
@@ -18,10 +18,9 @@ defmodule WebApiWeb.TransactionJSON do
   defp data(%Transaction{} = transaction) do
     %{
       id: transaction.id,
-      receiver: transaction.receiver,
+      amount: transaction.amount,
       sender: transaction.sender,
-      comment: transaction.comment,
-      amount: transaction.amount
+      receiver: transaction.receiver
     }
   end
 end

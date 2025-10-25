@@ -7,6 +7,7 @@ defmodule WebApiWeb.Router do
 
   scope "/api", WebApiWeb do
     pipe_through :api
+    resources "/customers", CustomerController, except: [:new, :edit]
     resources "/transactions", TransactionController, except: [:new, :edit]
   end
 

@@ -3,10 +3,9 @@ defmodule WebApi.Repo.Migrations.CreateTransactions do
 
   def change do
     create table(:transactions) do
-      add :receiver, :string
-      add :sender, :string
-      add :comment, :string
       add :amount, :float
+      add :sender, :string
+      add :receiver, :string
 
       timestamps(type: :utc_datetime)
     end

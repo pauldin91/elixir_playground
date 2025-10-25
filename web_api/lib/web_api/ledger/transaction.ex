@@ -1,20 +1,19 @@
-defmodule WebApi.Models.Transaction do
+defmodule WebApi.Ledger.Transaction do
   use Ecto.Schema
   import Ecto.Changeset
 
   schema "transactions" do
-    field :comment, :string
     field :receiver, :string
-    field :sender, :string
     field :amount, :float
-
+    field :sender, :string
+    field :timestamp, :utc_datetime
     timestamps(type: :utc_datetime)
   end
 
   @doc false
   def changeset(transaction, attrs) do
     transaction
-    |> cast(attrs, [:receiver, :sender, :comment, :amount])
-    |> validate_required([:receiver, :sender, :comment, :amount])
+    |> cast(attrs, [:amount, :sender, :receiver])
+    |> validate_required([:amount, :sender, :receiver])
   end
 end
