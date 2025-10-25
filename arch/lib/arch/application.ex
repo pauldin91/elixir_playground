@@ -3,7 +3,6 @@ defmodule Arch.Application do
 
   def start(_type, _args) do
     children = [
-      # This is the new line
       Arch.Scheduler
     ]
 

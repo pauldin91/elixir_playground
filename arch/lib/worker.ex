@@ -1,14 +1,13 @@
-defmodule Worker do
-  def start_link do
-    pid = spawn_link(fn -> loop() end)
-    Process.register(pid, :worker)
-  end
+defmodule Arch.Worker do
+  require Logger
 
-  defp loop do
-    receive do
-      :tick ->
-        IO.puts("#{DateTime.utc_now()} Tick received!")
-        loop()
-    end
+  def exec do
+    Task.start(fn ->
+      try do
+        Logger.info("Running cron job at #{DateTime.utc_now()}")
+      rescue
+        e -> Logger.error("Cron job failed: #{inspect(e)}")
+      end
+    end)
   end
 end
