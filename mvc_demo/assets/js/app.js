@@ -1,6 +1,6 @@
 // If you want to use Phoenix channels, run `mix help phx.gen.channel`
 // to get started and then uncomment the line below.
-// import "./user_socket.js"
+import "./user_socket.js"
 
 // You can include dependencies in two ways.
 //
@@ -21,6 +21,7 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
+import socket from "./user_socket.js"
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
@@ -41,4 +42,26 @@ liveSocket.connect()
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
+
+let channel       = socket.channel("room:lobby",{});
+let chatInput     = document.querySelector('#chat-input');
+let msgContainer = document.querySelector('#messages');
+
+chatInput.addEventListener("keypress",event=>{
+  if(event.keyCode==13){
+    channel.push("new_msg",{body: chatInput.value})
+    chatInput.value ='';
+  }
+});
+
+channel.on("new_msg",payload=>{
+  let msgItem=document.createElement("li");
+  msgItem.innerText=`[${Date()}]${payload}`;
+  msgContainer.appendChild(msgItem);
+});
+
+channel.join();
+
+export default socket;
+
 

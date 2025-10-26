@@ -11,9 +11,13 @@ defmodule MvcDemoWeb.Endpoint do
     same_site: "Lax"
   ]
 
-  socket "/live", Phoenix.LiveView.Socket,
-    websocket: [connect_info: [session: @session_options]],
-    longpoll: [connect_info: [session: @session_options]]
+  # socket "/live", Phoenix.LiveView.Socket,
+  #   websocket: [connect_info: [session: @session_options]],
+  #   longpoll: [connect_info: [session: @session_options]]
+
+  socket "/socket", MvcDemoWeb.UserSocket,
+    websocket: true,
+    longpoll: false
 
   # Serve at "/" the static files from "priv/static" directory.
   #
