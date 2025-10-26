@@ -11,4 +11,8 @@ defmodule MvcDemoWeb.Layouts do
   use MvcDemoWeb, :html
 
   embed_templates "layouts/*"
+
+  def title() do
+    @moduledoc
+  end
 end

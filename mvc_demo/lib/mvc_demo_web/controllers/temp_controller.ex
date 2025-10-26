@@ -3,6 +3,7 @@ defmodule MvcDemoWeb.TempController do
 
   def index(conn, _params) do
     conn
+    |> assign(:var, "Oumpa Lumpa")
     |> put_flash(:info, "welcome back!")
     |> render("index.html")
   end
