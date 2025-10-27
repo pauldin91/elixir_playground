@@ -23,7 +23,7 @@ defmodule MvcDemoWeb.Router do
   end
 
   scope "/cms", MvcDemoWeb.Cms, as: :cms do
-    pipe_through :browser
+    pipe_through [:browser, :auth_user]
     resources "/pages", PageController
   end
 
@@ -32,7 +32,7 @@ defmodule MvcDemoWeb.Router do
       nil ->
         conn
         |> Phoenix.Controller.put_flash(:error, "Login Required")
-        |> Phoenix.Controller.redirect(to: "/")
+        |> Phoenix.Controller.redirect(to: "/users")
         |> halt()
 
       user_id ->

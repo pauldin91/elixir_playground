@@ -2,12 +2,16 @@ defmodule MvcDemoWeb.SessionController do
   use MvcDemoWeb, :controller
   alias MvcDemo.Accounts
 
+  def new(conn, _) do
+    render(conn, "new.html")
+  end
+
   def create(conn, %{"user" => email, "password" => password}) do
     case(Accounts.authenticate(email, password)) do
       {:error, :unauthorized} ->
         conn
         |> put_flash(:error, "Invalid credentials")
-        |> redirect(to: ~p"/session/new")
+        |> redirect(to: ~p"/sessions/new")
 
       {:ok, user} ->
         conn
