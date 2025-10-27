@@ -20,6 +20,7 @@ defmodule MvcDemoWeb.Router do
     get "/", PageController, :home
     get "/temp", TempController, :index
     get "/temp/:name", TempController, :show
+    resources "/users", UserController
   end
 
   # Other scopes may use custom stacks.
