@@ -6,7 +6,7 @@ defmodule MvcDemo.Accounts do
   import Ecto.Query, warn: false
   alias MvcDemo.Repo
 
-  alias MvcDemo.Accounts.User
+  alias MvcDemo.Accounts.{User, Credential}
 
   @doc """
   Returns the list of users.
@@ -37,7 +37,11 @@ defmodule MvcDemo.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_user!(id), do: Repo.get!(User, id)
+  def get_user!(id),
+    do:
+      User
+      |> Repo.get!(id)
+      |> Repo.preload(:credential)
 
   @doc """
   Creates a user.
@@ -54,6 +58,7 @@ defmodule MvcDemo.Accounts do
   def create_user(attrs \\ %{}) do
     %User{}
     |> User.changeset(attrs)
+    |> Ecto.Changeset.cast_assoc(:credential, with: &Credential.changeset/2)
     |> Repo.insert()
   end
 
@@ -72,6 +77,7 @@ defmodule MvcDemo.Accounts do
   def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
+    |> Ecto.Changeset.cast_assoc(:credential, with: &Credential.changeset/2)
     |> Repo.update()
   end
 
@@ -205,5 +211,17 @@ defmodule MvcDemo.Accounts do
   """
   def change_credential(%Credential{} = credential, attrs \\ %{}) do
     Credential.changeset(credential, attrs)
+  end
+
+  def authenticate(email, _password) do
+    query =
+      from u in User,
+        inner_join: c in assoc(u, :credential),
+        where: c.email == ^email
+
+    case(Repo.one(query)) do
+      %User{} = user -> {:ok, user}
+      nil -> {:error, :unauthorized}
+    end
   end
 end

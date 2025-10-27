@@ -2,13 +2,10 @@
   <.error :if={@changeset.action}>
     Oops, something went wrong! Please check the errors below.
   </.error>
-  <.input field={f[:name]} type="text" label="Name" />
-  <.input field={f[:username]} type="text" label="Username" />
-  <.inputs_for :let={cf} field={f[:credential]}>
-    <.input field={cf[:email]} type="email" label="Email" />
-  </.inputs_for>
+  <.input field={f[:email]} type="text" label="Email" />
+  <.input field={f[:password]} type="password" label="Password" />
   <%!-- <.input field={f[:credential]} type="password" label="Credential" autocomplete="new-password" /> --%>
   <:actions>
-    <.button>Save User</.button>
+    <.button>Login</.button>
   </:actions>
 </.simple_form>

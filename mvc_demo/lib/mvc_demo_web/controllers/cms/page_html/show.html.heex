@@ -1,0 +1,17 @@
+<.header>
+  Page {@page.id}
+  <:subtitle>This is a page record from your database.</:subtitle>
+  <:actions>
+    <.link href={~p"/cms/pages/#{@page}/edit"}>
+      <.button>Edit page</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Title">{@page.title}</:item>
+  <:item title="Body">{@page.body}</:item>
+  <:item title="Views">{@page.views}</:item>
+</.list>
+
+<.back navigate={~p"/cms/pages"}>Back to pages</.back>
