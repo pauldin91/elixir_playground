@@ -97,8 +97,7 @@ defmodule LiveDemo.Timeline do
   """
   def delete_post(%Post{} = post) do
     Repo.delete(post)
-    # for delete
-    broadcast({:ok, nil}, :post_deleted)
+    |> broadcast(:post_deleted)
   end
 
   @doc """

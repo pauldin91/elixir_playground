@@ -34,11 +34,25 @@ defmodule LiveDemoWeb.PostLive.Index do
   end
 
   @impl true
-  def handle_info({:saved, post}, socket) do
+  def handle_info({LiveDemoWeb.PostLive.FormComponent, {:saved, post}}, socket) do
     {:noreply, stream_insert(socket, :posts, post)}
   end
 
+  def handle_info({:post_created, post}, socket) do
+    {:noreply, stream_insert(socket, :posts, post)}
+  end
+
+  def handle_info({:post_updated, post}, socket) do
+    {:noreply, stream_insert(socket, :posts, post)}
+  end
+
+  def handle_info({:post_deleted, item}, socket) do
+    {:noreply, stream_delete(socket, :posts, item)}
+  end
+
   @impl true
+  @spec handle_event(<<_::48>>, map(), Phoenix.LiveView.Socket.t()) ::
+          {:noreply, Phoenix.LiveView.Socket.t()}
   def handle_event("delete", %{"id" => id}, socket) do
     post = Timeline.get_post!(id)
     {:ok, _} = Timeline.delete_post(post)
