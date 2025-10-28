@@ -3,10 +3,13 @@ defmodule MvcDemoWeb.SessionController do
   alias MvcDemo.Accounts
 
   def new(conn, _) do
-    render(conn, "new.html")
+    render(conn, :new)
   end
 
   def create(conn, %{"user" => email, "password" => password}) do
+    IO.puts(email)
+    IO.puts(password)
+
     case(Accounts.authenticate(email, password)) do
       {:error, :unauthorized} ->
         conn

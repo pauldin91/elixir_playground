@@ -1,17 +1,15 @@
 <h1 class="text-2xl font-semibold mb-4">Sign in</h1>
 
 <!-- Sign in form -->
-<.form for={@conn} action={~p"/sessions"} as={:user} method="post">
-  <div class="space-y-4">
-    <.input field={:email} type="email" label="Email" placeholder="Email" />
-    <.input field={:password} type="password" label="Password" placeholder="Password" />
-    <.button class="w-full mt-2">Login</.button>
-  </div>
+<.form for={%{}} action={~p"/sessions"} method="post">
+  <.input field={:email} type="email" label="Email" placeholder="Email" />
+  <.input field={:password} type="password" label="Password" placeholder="Password" />
+  <.button class="w-full mt-2">Login</.button>
 </.form>
 
 <!-- Logout form -->
-<.form for={@conn} action={~p"/sessions"} method="delete" as={:user}>
+<.simple_form for={@conn} action={~p"/sessions"} method="delete" as={:user}>
   <.button class="mt-4 bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold px-4 py-2 rounded">
     Logout
   </.button>
-</.form>
+</.simple_form>
