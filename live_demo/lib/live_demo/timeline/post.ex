@@ -4,9 +4,9 @@ defmodule LiveDemo.Timeline.Post do
 
   schema "posts" do
     field :body, :string
-    field :username, :string
-    field :like_count, :integer
-    field :repost_count, :integer
+    field :username, :string, default: "username"
+    field :like_count, :integer, default: 0
+    field :repost_count, :integer, default: 0
 
     timestamps(type: :utc_datetime)
   end
@@ -14,7 +14,8 @@ defmodule LiveDemo.Timeline.Post do
   @doc false
   def changeset(post, attrs) do
     post
-    |> cast(attrs, [:username, :body, :like_count, :repost_count])
-    |> validate_required([:username, :body, :like_count, :repost_count])
+    |> cast(attrs, [:body])
+    |> validate_required([:body])
+    |> validate_length(:body, min: 2, max: 250)
   end
 end

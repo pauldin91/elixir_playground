@@ -6,6 +6,7 @@ defmodule LiveDemoWeb.PostLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
+    if connected?(socket), do: Timeline.subscribe()
     {:ok, stream(socket, :posts, Timeline.list_posts())}
   end
 
@@ -33,7 +34,7 @@ defmodule LiveDemoWeb.PostLive.Index do
   end
 
   @impl true
-  def handle_info({LiveDemoWeb.PostLive.FormComponent, {:saved, post}}, socket) do
+  def handle_info({:saved, post}, socket) do
     {:noreply, stream_insert(socket, :posts, post)}
   end
 

@@ -18,7 +18,15 @@ defmodule LiveDemo.Timeline do
 
   """
   def list_posts do
-    Repo.all(Post)
+    Repo.all(from p in Post, order_by: [desc: p.id])
+  end
+
+  def inc_likes(%Post{id: id}) do
+    {1, [post]} =
+      from(p in Post, where: p.id == ^id, select: p)
+      |> Repo.update_all(inc: [likes_count: 1])
+
+    broadcast({:ok, post}, :post_updated)
   end
 
   @doc """
@@ -53,6 +61,7 @@ defmodule LiveDemo.Timeline do
     %Post{}
     |> Post.changeset(attrs)
     |> Repo.insert()
+    |> broadcast(:post_created)
   end
 
   @doc """
@@ -71,6 +80,7 @@ defmodule LiveDemo.Timeline do
     post
     |> Post.changeset(attrs)
     |> Repo.update()
+    |> broadcast(:post_updated)
   end
 
   @doc """
@@ -87,6 +97,8 @@ defmodule LiveDemo.Timeline do
   """
   def delete_post(%Post{} = post) do
     Repo.delete(post)
+    # for delete
+    broadcast({:ok, nil}, :post_deleted)
   end
 
   @doc """
@@ -100,5 +112,18 @@ defmodule LiveDemo.Timeline do
   """
   def change_post(%Post{} = post, attrs \\ %{}) do
     Post.changeset(post, attrs)
+  end
+
+  # to handle errors
+  defp broadcast({:error, _reason} = error, _event), do: error
+
+  defp broadcast({:ok, post}, event) do
+    Phoenix.PubSub.broadcast(LiveDemo.PubSub, "posts", {event, post})
+    {:ok, post}
+  end
+
+  @spec subscribe() :: :ok | {:error, {:already_registered, pid()}}
+  def subscribe do
+    Phoenix.PubSub.subscribe(LiveDemo.PubSub, "posts")
   end
 end
