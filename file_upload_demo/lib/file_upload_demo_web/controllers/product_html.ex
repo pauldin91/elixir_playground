@@ -5,7 +5,7 @@ defmodule FileUploadDemoWeb.ProductHTML do
 
   def product(assigns) do
     ~H"""
-    <h1>Product component!</h1>
+    <h1>Product: {assigns.name}</h1>
     """
   end
 end

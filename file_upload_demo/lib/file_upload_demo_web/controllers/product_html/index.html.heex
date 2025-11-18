@@ -1,1 +1,7 @@
-<.product />
+<%= for product <- @products do %>
+  <.product name={product.name} />
+<% end %>
+
+<%!-- or --%>
+<h1>OR</h1>
+<.product :for={pr <- @products} name={pr.name} />
