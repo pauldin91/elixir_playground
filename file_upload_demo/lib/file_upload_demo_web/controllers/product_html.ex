@@ -1,6 +1,6 @@
 defmodule FileUploadDemoWeb.ProductHTML do
   use FileUploadDemoWeb, :html
-  alias FileUploadDemo.Product
+  alias FileUploadDemo.Products.Product
 
   embed_templates "product_html/*"
   attr :product, Product, required: true

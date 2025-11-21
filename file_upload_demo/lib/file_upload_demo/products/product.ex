@@ -1,4 +1,4 @@
-defmodule FileUploadDemo.Product do
+defmodule FileUploadDemo.Products.Product do
   use Ecto.Schema
   import Ecto.Changeset
 
