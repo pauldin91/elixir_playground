@@ -1,20 +1,18 @@
 defmodule FileUploadDemoWeb.ProductController do
   use FileUploadDemoWeb, :controller
 
-  @products [
-    %{id: "1", name: "Product_1"},
-    %{id: "2", name: "Product_2"},
-    %{id: "3", name: "Product_3"}
-  ]
+  alias FileUploadDemo.{Repo, Product}
 
   def index(conn, _params) do
+    products = Repo.all(Product)
+
     conn
-    |> assign(:products, @products)
+    |> assign(:products, products)
     |> render(:index)
   end
 
   def show(conn, %{"id" => id}) do
-    product = Enum.find(@products, fn p -> p.id == id end)
+    product = Repo.get(Product, id)
 
     conn
     |> assign(:product, product)
