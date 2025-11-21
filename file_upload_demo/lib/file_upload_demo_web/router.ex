@@ -18,7 +18,7 @@ defmodule FileUploadDemoWeb.Router do
     pipe_through :browser
 
     get "/products", ProductController, :index
-    get "/products/:id", ProductController, :show
+    get "/products/:slug", ProductController, :show
     get "/", PageController, :home
     live "/uploads", UploadLive.Index, :index
     live "/uploads/new", UploadLive.Index, :new
