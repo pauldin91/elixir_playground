@@ -22,6 +22,8 @@ defmodule FileUploadDemoWeb.Router do
 
     get "/products", ProductController, :index
     get "/products/:slug", ProductController, :show
+
+    live "/products-live", ProductLive.Index
     get "/", PageController, :home
     live "/uploads", UploadLive.Index, :index
     live "/uploads/new", UploadLive.Index, :new
