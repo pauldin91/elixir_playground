@@ -22,6 +22,7 @@ defmodule FileUploadDemoWeb.Router do
     get "/", PageController, :home
     live "/uploads", UploadLive.Index, :index
     live "/uploads/new", UploadLive.Index, :new
+    resources "/promotions", PromotionController
   end
 
   # Other scopes may use custom stacks.
